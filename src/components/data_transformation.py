@@ -27,20 +27,12 @@ class DataTransformation:
     def __init__(self):
         self.data_processor_config = DataTransformationConfig()
 
-    def get_transformer_object(self,train_path):
+    def get_transformer_object(self):
 
         try:
-            df = pd.read_csv(train_path)
-            categorical_columns = list(df.select_dtypes(include=['object']).columns)
-            numerical_columns = list(df.select_dtypes(exclude=['object']).columns)
-            print(categorical_columns)
-            print(numerical_columns)
-            #numerical_columns = ['SeniorCitizen', 'tenure', 'MonthlyCharges', 'TotalCharges']
-            #categorical_columns = ['gender', 'Partner', 'Dependents', 'PhoneService', 'MultipleLines', 'InternetService', 'OnlineSecurity', 'OnlineBackup', 'DeviceProtection', 'TechSupport', 'StreamingTV', 'StreamingMovies', 'Contract', 'PaperlessBilling', 'PaymentMethod', 'Churn']
-            
 
-           # self.numerical_columns = numerical_columns
-           # self.categorical_columns = categorical_columns
+            numerical_columns = ['SeniorCitizen' , 'tenure' , 'MonthlyCharges' , 'TotalCharges']
+            categorical_columns = ['gender','Partner','PhoneService','Dependents', 'MultipleLines', 'InternetService', 'OnlineSecurity', 'OnlineBackup', 'DeviceProtection', 'TechSupport', 'StreamingTV', 'StreamingMovies', 'Contract', 'PaperlessBilling', 'PaymentMethod' ]
 
             #Numerical column pipeline
             num_pipeline = Pipeline (
@@ -92,7 +84,16 @@ class DataTransformation:
 
             logging.info("Training and Testing Data read successfully")
 
-            preprocessor_obj = self.get_transformer_object(train_path)
+            condition1 = (train_data['TotalCharges'] == ' ')
+            condition2 = (test_data['TotalCharges'] == ' ')
+
+            train_data = train_data[~condition1]
+            test_data = test_data[~condition2]
+
+            train_data['TotalCharges'] = train_data['TotalCharges'].astype(float)
+            test_data['TotalCharges'] = test_data['TotalCharges'].astype(float)
+
+            preprocessor_obj = self.get_transformer_object()
 
             target_column_name = "Churn"
 
@@ -112,13 +113,13 @@ class DataTransformation:
 
             logging.info("Applied Preprocessing transformations on Train and Test datasets")
 
-            preprocessed_train_arr = np.c_(
+            preprocessed_train_arr = np.c_[
                 input_feature_train_arr , np.array(target_feature_train_df)
-            )
+            ]
 
-            preprocessed_test_arr = np.c_(
+            preprocessed_test_arr = np.c_[
                 input_feature_test_arr, np.array(target_feature_test_df)
-            )
+            ]
 
             save_object(
 

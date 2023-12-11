@@ -5,6 +5,8 @@ from src.exceptions import CustomException
 from src.logger import logging 
 from src.components.data_transformation import DataTransformationConfig
 from src.components.data_transformation import DataTransformation
+from src.components.model_trainer import ModelTrainerConfig
+from src.components.model_trainer import ModelTrainer
 
 from dataclasses import dataclass
 
@@ -58,14 +60,13 @@ if __name__ == "__main__":
     data_ingestion = DataIngestion()
     train_data_path , test_data_path = data_ingestion.initiate_data_ingestion()
 
-    print(train_data_path)
-    print(test_data_path)
-
     data_transformation = DataTransformation()
 
     train_arr,test_arr,processor_path = data_transformation.initiate_data_transformation(train_data_path,test_data_path)
 
-    print(train_arr)
-    print(test_arr)
-    print(processor_path)
+    model_trainer = ModelTrainer()
+    roc_score = model_trainer.initiate_model_trainer(train_arr,test_arr) 
+
+    print(roc_score)
+
     

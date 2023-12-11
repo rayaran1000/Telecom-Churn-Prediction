@@ -2,10 +2,9 @@ import os
 import sys
 import dill
 
-
 import numpy as np
 import pandas as pd
-from sklearn.metrics import r2_score
+from sklearn.metrics import roc_auc_score
 from sklearn.model_selection import GridSearchCV
 
 from src.exceptions import CustomException
@@ -50,8 +49,8 @@ def evaluate_model(X_train,y_train,X_test,y_test,models,param):
             y_train_pred = model.predict(X_train) # Predictions from the model
             y_test_pred = model.predict(X_test)
 
-            train_model_score = r2_score(y_train,y_train_pred) # R2 scores of the training and test datasets for the models
-            test_model_score = r2_score(y_test,y_test_pred)
+            train_model_score = roc_auc_score(y_train,y_train_pred) # R2 scores of the training and test datasets for the models
+            test_model_score = roc_auc_score(y_test,y_test_pred)
 
             report[list(models.keys())[i]] = (test_model_score,gs.best_params_) # Adding all the reports for each individual model in the report dictionary
 
