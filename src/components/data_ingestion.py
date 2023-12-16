@@ -7,6 +7,7 @@ from src.components.data_transformation import DataTransformationConfig
 from src.components.data_transformation import DataTransformation
 from src.components.model_trainer import ModelTrainerConfig
 from src.components.model_trainer import ModelTrainer
+from sklearn.model_selection import StratifiedKFold
 
 from dataclasses import dataclass
 
@@ -16,9 +17,9 @@ import pandas as pd
 
 @dataclass
 class DataIngestionConfig:
-    train_data_path : str=os.path.join('artifacts',"train.csv")
-    test_data_path : str=os.path.join('artifacts',"test.csv")
     raw_data_path : str=os.path.join('artifacts',"raw.csv")
+    test_data_path : str=os.path.join('artifacts',"test.csv")
+    train_data_path : str=os.path.join('artifacts',"train.csv")
 
 class DataIngestion:
     def __init__(self):
@@ -30,26 +31,30 @@ class DataIngestion:
         try:
 
             df = pd.read_csv('notebook\data\Telco-Customer-Churn.csv')
+            X = df.drop('Churn',axis=1)
+            y = df['Churn']
             logging.info("Read the dataset")
 
-            os.makedirs(os.path.dirname(self.ingestion_config.train_data_path),exist_ok=True) 
+            os.makedirs(os.path.dirname(self.ingestion_config.raw_data_path),exist_ok=True) 
             df.to_csv(self.ingestion_config.raw_data_path,index=False)
 
-            logging.info("Train Test Split initiated")
+#Applying train test splits to get training and testing data(used stratify because of imbalance in dataset)
+            X_train, X_test, y_train, y_test = train_test_split(X,y,test_size=0.2,random_state=42,stratify=y)
 
-            train_set , test_set = train_test_split(df,test_size=0.2,random_state=42)
+            train_data = pd.concat([X_train,y_train],axis=1)
+            test_data = pd.concat([X_test,y_test],axis=1)
 
-            train_set,test_set = train_test_split(df,test_size=0.2,random_state=42)
+#Saving the training and testing data in seperate csv files
+            train_data.to_csv(self.ingestion_config.train_data_path,index=False)
+            test_data.to_csv(self.ingestion_config.test_data_path,index=False)
 
-            train_set.to_csv(self.ingestion_config.train_data_path,index=False)
-            test_set.to_csv(self.ingestion_config.test_data_path,index=False)
-
-            logging.info("Data Ingestion Completed")
+            logging.info("Finished the Data Ingestion Process")
 
             return(
 
-                self.ingestion_config.train_data_path,
-                self.ingestion_config.test_data_path
+                self.ingestion_config.raw_data_path,
+                self.ingestion_config.test_data_path,
+                self.ingestion_config.train_data_path
 
             )
         
@@ -58,15 +63,16 @@ class DataIngestion:
         
 if __name__ == "__main__":
     data_ingestion = DataIngestion()
-    train_data_path , test_data_path = data_ingestion.initiate_data_ingestion()
+    raw_data_path,test_data_path,train_data_path = data_ingestion.initiate_data_ingestion()   
 
     data_transformation = DataTransformation()
 
     train_arr,test_arr,processor_path = data_transformation.initiate_data_transformation(train_data_path,test_data_path)
 
-    model_trainer = ModelTrainer()
-    roc_score = model_trainer.initiate_model_trainer(train_arr,test_arr) 
 
-    print(roc_score)
+    model_trainer = ModelTrainer()
+    best_model_name = model_trainer.initiate_model_trainer(train_arr,test_arr) 
+
+    print(best_model_name)
 
     

@@ -5,7 +5,7 @@ import dill
 import numpy as np
 import pandas as pd
 from sklearn.metrics import roc_auc_score
-from sklearn.model_selection import GridSearchCV
+from sklearn.model_selection import GridSearchCV, StratifiedKFold, cross_val_score
 
 from src.exceptions import CustomException
 
@@ -31,31 +31,44 @@ def load_object(file_path):# Function used to load the pickle files
         raise CustomException(e,sys)
     
 #Function created to evaluate the models and create a dictionary report consisting of the error values and the model names for both train and test datasets
-def evaluate_model(X_train,y_train,X_test,y_test,models,param):
+def evaluate_model(X_train, y_train, X_test , y_test, models, params):
     try:
-        report ={}
+        report = {}
 
-        for i in range(len(list(models))):
-            model=list(models.values())[i]
-            para = param[list(models.keys())[i]] #Extracting the parameters for each model
+        stratified_kfold = StratifiedKFold(n_splits=3, shuffle=True, random_state=42)
 
-            gs = GridSearchCV(model,para,cv=3)
-            gs.fit(X_train,y_train)
+        for model_name, model in models.items():
+            param = params[model_name]
 
-            model.set_params(**gs.best_params_) # The best parameters we get are used for the respective model
-            model.fit(X_train,y_train)  # We are training the model here with the best parameters.
-            
+            gs = GridSearchCV(model, param, cv=stratified_kfold)
+            gs.fit(X_train, y_train)
 
-            y_train_pred = model.predict(X_train) # Predictions from the model
-            y_test_pred = model.predict(X_test)
+            best_model = gs.best_estimator_
 
-            train_model_score = roc_auc_score(y_train,y_train_pred) # R2 scores of the training and test datasets for the models
-            test_model_score = roc_auc_score(y_test,y_test_pred)
+            # Perform Stratified K-Fold cross-validation
+            cv_scores = cross_val_score(best_model, X_train, y_train, cv=stratified_kfold, scoring='roc_auc')
 
-            report[list(models.keys())[i]] = (test_model_score,gs.best_params_) # Adding all the reports for each individual model in the report dictionary
+            # Train the best model on the training dataset
+            best_model.fit(X_train, y_train)
+
+            # Make predictions on the entire dataset
+            y_pred = best_model.predict(X_test)
+
+            # Calculate the ROC AUC score on the entire dataset
+            model_score = roc_auc_score(y_test, y_pred)
+
+            report[model_name] = {
+               # 'best_params': gs.best_params_,
+               # 'cv_scores': cv_scores,
+                'overall_score': model_score
+            }
 
         return report
-    
+
+# Example usage:
+# report = evaluate_model(X, y, models, param)
+# print(report)
+   
     except Exception as e:
         raise CustomException(e,sys)
     
