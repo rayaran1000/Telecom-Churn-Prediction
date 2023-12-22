@@ -109,14 +109,14 @@ class ModelTrainer:
 
             best_model = models[best_model_name]
 
+            best_model.fit(X_train, y_train)
+
             logging.info("Best found model on both training and testing datasets")
 
             save_object(# Creating the Model.pkl file corresponding to the best model that we will get
                 file_path=self.model_config.trained_model_file_path,
                 obj=best_model
             )
-
-            best_model.fit(X_train, y_train)
 
             predicted = best_model.predict(X_test)
 

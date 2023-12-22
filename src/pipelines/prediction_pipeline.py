@@ -91,24 +91,24 @@ class CustomData: # Class responsible for mapping all the inputs that we are get
         try:
             custom_data_input_dict = {
                 "gender": [self.gender],
-                "senior_citizen": [self.senior_citizen],
-                "partner": [self.partner],
-                "dependents": [self.dependents],
-                "tenure_in_months": [self.tenure_in_months],
-                "phone_service": [self.phone_service],
-                "multiple_lines": [self.multiple_lines],
-                "internet_service": [self.internet_service],
-                "online_security": [self.online_security],
-                "online_backup": [self.online_backup],
-                "device_security": [self.device_security],
-                "tech_support": [self.tech_support],
-                "streaming_tv": [self.streaming_tv],
-                "streaming_movies": [self.streaming_movies],
-                "contract": [self.contract],
-                "paperless_billing": [self.paperless_billing],
-                "payment_method": [self.payment_method],
-                "monthly_charges": [self.monthly_charges],
-                "total_charges": [self.total_charges]
+                "SeniorCitizen": [self.senior_citizen],
+                "Partner": [self.partner],
+                "Dependents": [self.dependents],
+                "tenure": [self.tenure_in_months],
+                "PhoneService": [self.phone_service],
+                "MultipleLines": [self.multiple_lines],
+                "InternetService": [self.internet_service],
+                "OnlineSecurity": [self.online_security],
+                "OnlineBackup": [self.online_backup],
+                "DeviceProtection": [self.device_security],
+                "TechSupport": [self.tech_support],
+                "StreamingTV": [self.streaming_tv],
+                "StreamingMovies": [self.streaming_movies],
+                "Contract": [self.contract],
+                "PaperlessBilling": [self.paperless_billing],
+                "PaymentMethod": [self.payment_method],
+                "MonthlyCharges": [self.monthly_charges],
+                "TotalCharges": [self.total_charges]
             }
 
             return pd.DataFrame(custom_data_input_dict)
