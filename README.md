@@ -1,6 +1,8 @@
 
 # Telecom Churn Analysis
 
+![Screenshot 2024-01-08 162047](https://github.com/rayaran1000/Telecom-Churn-Prediction/assets/122597408/d5fa74bc-884e-4e32-98e1-fb00a2aa4990)
+
 ### Primary objective
 Identify patterns, factors, and trends that contribute to customer churn, which occurs when customers discontinue their engagement with a product, service, or brand. By analyzing this data, we can uncover insights into customer behavior, preferences, and pain points that may lead to churn.
 
